@@ -5,7 +5,6 @@ const goods = [
     { title: 'Socks', price : 200},
     { title: 'Shoes', price : 250},
 ]
-
 const renderGoodsItem = (title = 'Item title', price='Item price') => {
         return `
         <div class="goods-item">
@@ -15,7 +14,6 @@ const renderGoodsItem = (title = 'Item title', price='Item price') => {
         </div>
     `
 }
-
 const renderGoodsList = ( [...rest] ) => {
     let goodsList = rest.map(({title, price} = item) => {
         return renderGoodsItem(title, price)        
