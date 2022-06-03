@@ -9,17 +9,23 @@ const goods = [
 const BASE_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses'
 const GOODS = `${BASE_URL}/catalogData.json`
 const BASKET_GOODS = `${BASE_URL}/getBasket.json`
+const form = document.querySelector('form')
+const search = document.querySelector('.search-input')
+console.log(search);
+
 
 
 function service(url, callback){
-    const xhr = new XMLHttpRequest()
-    xhr.open('GET', url);
-    const loadHandler = () => {
-        callback(JSON.parse(xhr.response))
-    }
-    xhr.onload = loadHandler
+    return new Promise((resolve)=>{
+        const xhr = new XMLHttpRequest()
+        xhr.open('GET', url);
+        const loadHandler = () => {
+            resolve(JSON.parse(xhr.response))
+        }
+        xhr.onload = loadHandler
 
-    xhr.send();
+        xhr.send();
+    })
 }
 
 class GoodsItem {
@@ -40,23 +46,34 @@ class GoodsItem {
 
 class GoodsList {
     items = []
-    fetchGoods(callback){
-        service(GOODS, (data)=>{
-            this.list = data;
-            callback()
+    filtredItems = []
+    fetchGoods(){
+        const prom = service(GOODS)
+        prom.then((data)=>{
+            this.items = data;
+            this.filtredItems = data;
+        })
+        return prom
+    }
+    filter(str){
+        this.filtredItems = this.items.filter(({product_name})=>{
+            debugger
+
+            return (new RegExp(str, 'i')).test(product_name)
         })
     }
     getCount(){
-        this.list.reduce((sum, {price}) => sum + price, 0);
+        this.items.reduce((sum, {price}) => sum + price, 0);
     }
     render(){
-        let goodsList = this.list.map(item => {
+        let goodsList = this.items.map(item => {
             const goodsItem = new GoodsItem(item)
             return goodsItem.render()
         }).join('')
         let box = document.querySelector('.goods')
         box.innerHTML = goodsList
-    }
+    };
+   
 }
 
 class BasketGoodsList{
@@ -73,12 +90,18 @@ class BasketGoodsList{
 
 
 const goodsList = new GoodsList(goods)
-goodsList.fetchGoods(()=>{
+
+goodsList.fetchGoods().then(()=>{
     goodsList.getCount()
     goodsList.render()
 })
 
 const basketGoods= new BasketGoodsList();
-basketGoods.fetchData(()=>{
-    
+    basketGoods.fetchData(()=>{
+})
+
+form.addEventListener('submit', function(event){
+    event.preventDefault();
+    goodsList.filter(search.value)
+    goodsList.render()
 })
