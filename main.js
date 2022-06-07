@@ -11,7 +11,6 @@ const GOODS = `${BASE_URL}/catalogData.json`
 const BASKET_GOODS = `${BASE_URL}/getBasket.json`
 const form = document.querySelector('form')
 const search = document.querySelector('.search-input')
-console.log(search);
 
 
 
@@ -33,15 +32,7 @@ class GoodsItem {
         this.title = product_name;
         this.price = price;
     }
-    render () {
-        return `
-            <div class="goods-item">
-                <img src="" alt=""> 
-                <h3>${this.title}</h3>
-                <p>${this.price}</p>
-            </div>
-        `
-    }
+    
 }
 
 class GoodsList {
@@ -57,8 +48,6 @@ class GoodsList {
     }
     filter(str){
         this.filtredItems = this.items.filter(({product_name})=>{
-            debugger
-
             return (new RegExp(str, 'i')).test(product_name)
         })
     }
@@ -89,19 +78,57 @@ class BasketGoodsList{
 
 
 
-const goodsList = new GoodsList(goods)
+// const goodsList = new GoodsList(goods)
 
-goodsList.fetchGoods().then(()=>{
-    goodsList.getCount()
-    goodsList.render()
-})
+// goodsList.fetchGoods().then(()=>{
+//     goodsList.getCount()
+//     goodsList.render()
+// })
 
-const basketGoods= new BasketGoodsList();
-    basketGoods.fetchData(()=>{
-})
+// const basketGoods= new BasketGoodsList();
+//     basketGoods.fetchData(()=>{
+// })
 
-form.addEventListener('submit', function(event){
-    event.preventDefault();
-    goodsList.filter(search.value)
-    goodsList.render()
-})
+// form.addEventListener('submit', function(event){
+//     event.preventDefault();
+//     goodsList.filter(search.value)
+//     goodsList.render()
+// })
+
+
+window.onload = () => {
+    const app = new Vue({
+        el: '#root',
+        data:{
+            items:[],
+            searchValue:'',
+            isCardVisible:false,
+        },
+        mounted() {
+            const prom = service(GOODS)
+            prom.then((data)=>{
+                this.items = data;
+            })
+            return prom
+        },
+        computed:{
+            getCount(){
+                this.items.reduce((sum, {price}) => sum + price, 0);
+            },
+            filtredItems(){
+                return this.items.filter(({product_name})=>{
+                    return (new RegExp(this.searchValue, 'i')).test(product_name)
+                })
+
+            }
+        },
+        methods: {
+            cardOpen(){
+               this.isCardVisible = true;
+            },
+            cardClose(){
+                this.isCardVisible = false;
+             }
+        },
+    })
+}
