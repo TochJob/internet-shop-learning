@@ -6,22 +6,129 @@ const goods = [
     { title: 'Shoes', price : 250},
 ]
 
-const renderGoodsItem = (title = 'Item title', price='Item price') => {
-        return `
-        <div class="goods-item">
-            <img src="" alt=""> 
-            <h3>${title}</h3>
-            <p>${price}</p>
-        </div>
-    `
+const BASE_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses'
+const GOODS = `${BASE_URL}/catalogData.json`
+const BASKET_GOODS = `${BASE_URL}/getBasket.json`
+const form = document.querySelector('form')
+const search = document.querySelector('.search-input')
+
+
+
+function service(url, callback){
+    return new Promise((resolve)=>{
+        const xhr = new XMLHttpRequest()
+        xhr.open('GET', url);
+        const loadHandler = () => {
+            resolve(JSON.parse(xhr.response))
+        }
+        xhr.onload = loadHandler
+
+        xhr.send();
+    })
 }
 
-const renderGoodsList = ( [...rest] ) => {
-    let goodsList = rest.map(({title, price} = item) => {
-        return renderGoodsItem(title, price)        
-    }).join('')
-    let box = document.querySelector('.goods')
-    box.innerHTML = goodsList
+class GoodsItem {
+    constructor({product_name = 'Item title', price='Item price'}){
+        this.title = product_name;
+        this.price = price;
+    }
+    
 }
 
-renderGoodsList(goods)
+class GoodsList {
+    items = []
+    filtredItems = []
+    fetchGoods(){
+        const prom = service(GOODS)
+        prom.then((data)=>{
+            this.items = data;
+            this.filtredItems = data;
+        })
+        return prom
+    }
+    filter(str){
+        this.filtredItems = this.items.filter(({product_name})=>{
+            return (new RegExp(str, 'i')).test(product_name)
+        })
+    }
+    getCount(){
+        this.items.reduce((sum, {price}) => sum + price, 0);
+    }
+    render(){
+        let goodsList = this.items.map(item => {
+            const goodsItem = new GoodsItem(item)
+            return goodsItem.render()
+        }).join('')
+        let box = document.querySelector('.goods')
+        box.innerHTML = goodsList
+    };
+   
+}
+
+class BasketGoodsList{
+    items = [];
+    fetchData(callback){
+        service(BASKET_GOODS, (data)=>{
+            this.items = data;
+            callback()
+        })
+    }
+}
+
+
+
+
+// const goodsList = new GoodsList(goods)
+
+// goodsList.fetchGoods().then(()=>{
+//     goodsList.getCount()
+//     goodsList.render()
+// })
+
+// const basketGoods= new BasketGoodsList();
+//     basketGoods.fetchData(()=>{
+// })
+
+// form.addEventListener('submit', function(event){
+//     event.preventDefault();
+//     goodsList.filter(search.value)
+//     goodsList.render()
+// })
+
+
+window.onload = () => {
+    const app = new Vue({
+        el: '#root',
+        data:{
+            items:[],
+            searchValue:'',
+            isCardVisible:false,
+        },
+        mounted() {
+            const prom = service(GOODS)
+            prom.then((data)=>{
+                this.items = data;
+            })
+            return prom
+        },
+        computed:{
+            getCount(){
+                this.items.reduce((sum, {price}) => sum + price, 0);
+            },
+            filtredItems(){
+                return this.items.filter(({product_name})=>{
+                    return (new RegExp(this.searchValue, 'i')).test(product_name)
+                })
+
+            }
+        },
+        methods: {
+            cardOpen(){
+               this.isCardVisible = true;
+            },
+            cardClose(){
+                this.isCardVisible = false;
+             }
+        },
+    })
+}
