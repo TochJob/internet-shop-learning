@@ -6,19 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="main.css">
     <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="main.js"></script>
 </head>
 <body>
-    <header>
-        <button class="button basket-button">Корзина</button>
-    </header>
-    <main>
-        <div class="goods">
+    <div id="root">
+        <header class="header">
+            <custom-button @click="cardVisibleToggler">Корзина</custom-button>
+            <basket v-if="isCardVisible" @close="cardVisibleToggler"></basket>
+            <form action="">
+                <search-input v-model="searchValue"></search-input>
+                <!-- <input type="text" class="search-input" > -->
+                <!-- <button class="closeBtn" @click="cardVisibleToggler">Search</button> -->
+            </form>
+        </header>
+        <main>
+            <div class="goods">
+                <good v-for="item in filtredItems" :item="item"></good>
+            </div>
+        </main>    
+    </div>
 
-        </div>
-    </main>    
 
 
-
-    <script src="main.js"></script>
 </body>
 </html>
