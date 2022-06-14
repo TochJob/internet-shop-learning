@@ -76,27 +76,41 @@ class BasketGoodsList{
 }
 
 
-
-
-// const goodsList = new GoodsList(goods)
-
-// goodsList.fetchGoods().then(()=>{
-//     goodsList.getCount()
-//     goodsList.render()
-// })
-
-// const basketGoods= new BasketGoodsList();
-//     basketGoods.fetchData(()=>{
-// })
-
-// form.addEventListener('submit', function(event){
-//     event.preventDefault();
-//     goodsList.filter(search.value)
-//     goodsList.render()
-// })
-
-
 window.onload = () => {
+    Vue.component('search-input',{
+        template:`<input type="text" class="search-input" @input="$emit('input', $event.target.value)">`
+    })
+    
+    Vue.component('custom-button',{
+        template:`
+        <button class="button" @click="$emit('click')">
+            <slot></slot>
+        </button>` 
+    })
+    
+    Vue.component('good', {
+        props:[
+            'item'
+        ],
+        template:`
+        <div class="goods-item">
+            <img src="" alt=""> 
+            <h3>{{item.product_name}}</h3>
+            <p>{{item.price}}</p>
+        </div>
+        `
+    })
+
+    Vue.component('basket', {
+        template:`
+        <div class="basketBox"> 
+            <div class="basketWrapper">
+                <button class="closeBtn" @click="$emit('close')">X</button>
+            </div>
+        </div>
+        `
+    })
+
     const app = new Vue({
         el: '#root',
         data:{
@@ -123,12 +137,9 @@ window.onload = () => {
             }
         },
         methods: {
-            cardOpen(){
-               this.isCardVisible = true;
+            cardVisibleToggler(){
+               this.isCardVisible=!this.isCardVisible;
             },
-            cardClose(){
-                this.isCardVisible = false;
-             }
         },
     })
 }

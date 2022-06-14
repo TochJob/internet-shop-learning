@@ -12,24 +12,17 @@
 <body>
     <div id="root">
         <header class="header">
-            <button class="button basket-button" @click="cardOpen">Корзина</button>
-            <div class="cardBox" v-if="isCardVisible"> 
-               <div class="cardWrapper">
-                    <button class="closeBtn" @click="cardClose">X</button>
-               </div>
-            </div>
+            <custom-button @click="cardVisibleToggler">Корзина</custom-button>
+            <basket v-if="isCardVisible" @close="cardVisibleToggler"></basket>
             <form action="">
-                <input type="text" class="search-input" v-model="searchValue">
-                <!-- <button class="button button-search">Search</button> -->
+                <search-input v-model="searchValue"></search-input>
+                <!-- <input type="text" class="search-input" > -->
+                <!-- <button class="closeBtn" @click="cardVisibleToggler">Search</button> -->
             </form>
         </header>
         <main>
             <div class="goods">
-                <div class="goods-item" v-for="item in filtredItems">
-                    <img src="" alt=""> 
-                    <h3>{{item.product_name}}</h3>
-                    <p>{{item.price}}</p>
-                </div>
+                <good v-for="item in filtredItems" :item="item"></good>
             </div>
         </main>    
     </div>
