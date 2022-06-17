@@ -13,7 +13,9 @@
     <div id="root">
         <header class="header">
             <custom-button @click="cardVisibleToggler">Корзина</custom-button>
-            <basket v-if="isCardVisible" @close="cardVisibleToggler"></basket>
+            <basket v-if="isCardVisible" @close="cardVisibleToggler">
+                <basketItem></basketItem>
+            </basket>
             <form action="">
                 <search-input v-model="searchValue"></search-input>
                 <!-- <input type="text" class="search-input" > -->

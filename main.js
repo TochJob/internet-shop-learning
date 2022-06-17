@@ -6,9 +6,9 @@ const goods = [
     { title: 'Shoes', price : 250},
 ]
 
-const BASE_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses'
-const GOODS = `${BASE_URL}/catalogData.json`
-const BASKET_GOODS = `${BASE_URL}/getBasket.json`
+const BASE_URL = 'http://localhost:8000'
+const GOODS = `${BASE_URL}/goods.json`
+const BASKET_GOODS = `${BASE_URL}/basket`
 const form = document.querySelector('form')
 const search = document.querySelector('.search-input')
 
@@ -65,16 +65,6 @@ class GoodsList {
    
 }
 
-class BasketGoodsList{
-    items = [];
-    fetchData(callback){
-        service(BASKET_GOODS, (data)=>{
-            this.items = data;
-            callback()
-        })
-    }
-}
-
 
 window.onload = () => {
     Vue.component('search-input',{
@@ -101,14 +91,43 @@ window.onload = () => {
         `
     })
 
-    Vue.component('basket', {
+    Vue.component('basketItem', {
+        template:`
+            <div class="basketItem">
+                <img src="" alt=""> 
+                <h3>{{item.product_name}}</h3>
+                <p>{{item.price}}</p>
+
+                <div class="count">
+                    <button class="minusCount">-</button>
+                    <p>{{item.count}}</p>
+                    <button class="plusCount">+</button>
+                </div>
+
+
+            </div>
+        `
+    })
+
+    const basketGoods = Vue.component('basket', {
+        data(){
+            return{
+                basketGoodsItems: []
+            }
+        },
+
         template:`
         <div class="basketBox"> 
             <div class="basketWrapper">
                 <button class="closeBtn" @click="$emit('close')">X</button>
             </div>
         </div>
-        `
+        `,
+        mounted(){
+            service(BASKET_GOODS).then((data)=>{
+                this.basketGoodsItems = data
+            })
+        }
     })
 
     const app = new Vue({
